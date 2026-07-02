@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("editor")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  phone     String?
+  password  String
+  address   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+  leads     Lead[]
+}
+
+model PageSection {
+  id       Int      @id @default(autoincrement())
+  slug     String   @unique
+  title    String?
+  subtitle String?
+  content  Json?
+  images   Json?
+  active   Boolean  @default(true)
+  order    Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+model ServiceCard {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  icon        String?
+  image       String?
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PortfolioItem {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  images      Json?
+  area        String?
+  featured    Boolean  @default(false)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProcessStep {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  stepNumber  Int      @unique
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model KpiConfig {
+  id     Int      @id @default(autoincrement())
+  label  String
+  value  String
+  icon   String?
+  active Boolean  @default(true)
+  order  Int      @default(0)
+}
+
+model Differential {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  icon        String?
+  order       Int      @default(0)
+}
+
+model SiteSetting {
+  id              Int    @id @default(autoincrement())
+  whatsappNumber  String @default("5511999999999")
+  email           String?
+  address         String?
+  googleAnalytics String?
+  logo            String?
+  favicon         String?
+  metaTitle       String?
+  metaDescription String?
+}
+
+model Lead {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String?
+  phone     String?
+  message   String?
+  source    String   @default("site")
+  read      Boolean  @default(false)
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String   @default("budget")
+  photos      Json?
+  files       Json?
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
