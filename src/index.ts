@@ -32,6 +32,12 @@ app.use(express.json({ limit: "10mb" }));
 
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
+const adminDistPath = path.join(__dirname, "..", "..", "admin", "dist");
+app.use("/admin", express.static(adminDistPath));
+app.get("/admin/*", (_req, res) => {
+  res.sendFile(path.join(adminDistPath, "index.html"));
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/sections", sectionsRoutes);
 app.use("/api/services", servicesRoutes);

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 import prisma from "../lib/prisma.js";
+import { authenticate } from "../middleware/auth.js";
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
@@ -97,6 +98,18 @@ router.post("/refresh", async (req: Request, res: Response) => {
   } catch {
     return res.status(401).json({ error: "Refresh token invalido" });
   }
+});
+
+router.get("/me", authenticate, async (req: Request, res: Response) => {
+  if (req.user?.role === "admin") {
+    const admin = await prisma.admin.findUnique({ where: { id: req.user.id } });
+    if (!admin) return res.status(404).json({ error: "Admin nao encontrado" });
+    return res.json({ admin: { id: admin.id, name: admin.name, email: admin.email, role: admin.role } });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+  if (!user) return res.status(404).json({ error: "Usuario nao encontrado" });
+  return res.json({ user: { id: user.id, name: user.name, email: user.email, role: "user" } });
 });
 
 export default router;
